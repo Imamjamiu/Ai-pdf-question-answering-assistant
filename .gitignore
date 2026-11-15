@@ -1,0 +1,22 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+# Uploaded documents and private data
+data/
+uploads/
+*.pdf
+
+# Generated files
+*.pkl
+*.pickle
+*.faiss
+*.db
+
+# IDE and operating system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

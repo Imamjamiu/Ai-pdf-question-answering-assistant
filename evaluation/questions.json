@@ -1,0 +1,186 @@
+{
+  "source_pdf": "Data/Virtual Memory -OS.pdf",
+  "page_numbering": "PDF page numbers are 1-based and refer to the uploaded file.",
+  "questions": [
+    {
+      "id": "virtual_memory_definition",
+      "question": "What does virtual memory allow a process to do when it is not completely in physical memory?",
+      "expected_pages": [1],
+      "answer_key": "Virtual memory allows a process to execute without being completely in physical memory. It separates the logical memory view from physical memory."
+    },
+    {
+      "id": "partial_process_benefits",
+      "question": "What benefits come from keeping only the needed portions of programs in physical memory?",
+      "expected_pages": [2],
+      "answer_key": "Programs can exceed physical memory, more programs can run at once, CPU utilization and throughput can improve, and less I/O is needed to load or swap program portions."
+    },
+    {
+      "id": "sparse_address_space",
+      "question": "What is the hole between the heap and stack in a sparse virtual address space for?",
+      "expected_pages": [3],
+      "answer_key": "The hole reserves virtual address space that needs physical pages only if the heap or stack grows; it can also support dynamic library linking."
+    },
+    {
+      "id": "shared_library_pages",
+      "question": "How can separate processes share a system library while each sees it in its own address space?",
+      "expected_pages": [4],
+      "answer_key": "Each process maps the library into its virtual address space, while the library's actual physical pages are shared. Libraries are typically mapped read-only."
+    },
+    {
+      "id": "demand_paging",
+      "question": "What is demand paging, and why can it use memory more efficiently?",
+      "expected_pages": [5],
+      "answer_key": "Demand paging loads a page only when it is needed during execution, so pages that are never accessed are not loaded into physical memory."
+    },
+    {
+      "id": "valid_invalid_bits",
+      "question": "What do valid and invalid page-table bits mean in a demand-paged system?",
+      "expected_pages": [5, 6],
+      "answer_key": "A valid bit means the page is legal and in memory. An invalid bit means the page is either outside the process's legal address space or is legal but currently in secondary storage."
+    },
+    {
+      "id": "illegal_page_reference",
+      "question": "What does the operating system do if a page fault comes from an illegal memory reference?",
+      "expected_pages": [6],
+      "answer_key": "The operating system checks whether the reference is valid; if it is invalid, it terminates the process."
+    },
+    {
+      "id": "basic_page_fault_steps",
+      "question": "What are the basic steps for handling a valid page fault, from checking the reference to resuming the process?",
+      "expected_pages": [6, 7],
+      "answer_key": "Check that the reference is legal, find a free frame, read the page from secondary storage, update the process and page tables, and restart the interrupted instruction."
+    },
+    {
+      "id": "instruction_restart",
+      "question": "Why must the operating system save state and restart an instruction after a page fault?",
+      "expected_pages": [7, 8],
+      "answer_key": "The instruction may fault during an instruction fetch or operand access. After loading the page, the process must resume in the same state; it may need to fetch and decode the instruction and operands again."
+    },
+    {
+      "id": "partial_instruction_fault",
+      "question": "How can a system safely handle a page fault during an instruction that modifies several memory locations?",
+      "expected_pages": [8],
+      "answer_key": "One method accesses all relevant page boundaries before modifying anything. Another saves overwritten values in temporary registers and restores them if a fault occurs."
+    },
+    {
+      "id": "page_fault_full_sequence",
+      "question": "Describe the page-fault service sequence, including what is conditional about running another process during the page read.",
+      "expected_pages": [9, 10],
+      "answer_key": "The OS traps and saves state, validates the reference, reads the page into a frame, updates tables, then restores state and resumes the instruction. The OS may schedule another process during I/O; saving that process's state and waiting to reschedule the faulted process apply when that switch occurs."
+    },
+    {
+      "id": "effective_access_time_formula",
+      "question": "What formula does the chapter give for effective access time when p is the page-fault probability?",
+      "expected_pages": [9],
+      "answer_key": "Effective access time = (1 - p) × memory-access time + p × page-fault time."
+    },
+    {
+      "id": "effective_access_time_example",
+      "question": "With a 200-nanosecond memory access and an 8-millisecond page-fault service time, what effective access-time expression does the chapter derive?",
+      "expected_pages": [10],
+      "answer_key": "The expression is 200 + 7,999,800 × p nanoseconds."
+    },
+    {
+      "id": "zero_fill_on_demand",
+      "question": "What are zero-fill-on-demand frames, and why are they cleared before allocation?",
+      "expected_pages": [9],
+      "answer_key": "They are frames zeroed before allocation, which erases their previous contents and avoids exposing data left by another use."
+    },
+    {
+      "id": "filesystem_backing_store",
+      "question": "When can the file system serve as backing store, and which pages still need swap space?",
+      "expected_pages": [11],
+      "answer_key": "Unmodified executable pages can be read again from the file system and discarded when replaced. Anonymous pages, including stack and heap pages, still need swap space."
+    },
+    {
+      "id": "copy_on_write",
+      "question": "How does copy-on-write make fork faster, and when is a shared page copied?",
+      "expected_pages": [11, 12],
+      "answer_key": "Parent and child initially share copy-on-write pages. A page is copied only when one process writes to it; unmodified pages remain shared."
+    },
+    {
+      "id": "page_replacement_no_free_frames",
+      "question": "What does the operating system do when a page fault occurs but there are no free frames?",
+      "expected_pages": [13, 14],
+      "answer_key": "It selects a victim frame using a page-replacement algorithm, writes the victim to storage if necessary, updates tables, and loads the desired page into the freed frame."
+    },
+    {
+      "id": "modify_bit",
+      "question": "How does the modify or dirty bit reduce page-replacement I/O?",
+      "expected_pages": [14, 15],
+      "answer_key": "A set bit means the page changed and must be written to storage before replacement. If it is clear, the page can be discarded because its stored copy is still current."
+    },
+    {
+      "id": "reference_string",
+      "question": "What is a reference string, and what extra information is needed to compare page-replacement algorithms?",
+      "expected_pages": [16],
+      "answer_key": "A reference string is the sequence of page numbers a process references. The number of available page frames is also needed to count page faults."
+    },
+    {
+      "id": "fifo_replacement",
+      "question": "How does FIFO choose a page to replace, and what fault count does the chapter's three-frame example produce?",
+      "expected_pages": [16, 17],
+      "answer_key": "FIFO replaces the page that has been in memory longest, often implemented as a queue. The chapter's example produces fifteen page faults."
+    },
+    {
+      "id": "beladys_anomaly",
+      "question": "What is Belady's anomaly in page replacement?",
+      "expected_pages": [18],
+      "answer_key": "For some algorithms, increasing the number of allocated frames can increase the page-fault rate; the chapter illustrates this with FIFO."
+    },
+    {
+      "id": "optimal_replacement",
+      "question": "How does optimal page replacement choose a victim, and why is it mainly used for comparison?",
+      "expected_pages": [18, 19],
+      "answer_key": "It replaces the page whose next use is farthest in the future. It is mainly a benchmark because an operating system cannot generally know future references."
+    },
+    {
+      "id": "lru_replacement",
+      "question": "How does LRU choose a victim, and what are two implementation approaches described in the chapter?",
+      "expected_pages": [19, 20],
+      "answer_key": "LRU replaces the page that has not been used for the longest time. The chapter describes counters/time-of-use fields and a stack implemented as a doubly linked list; both need hardware support for efficient updates."
+    },
+    {
+      "id": "stack_property",
+      "question": "Why do LRU and optimal replacement avoid Belady's anomaly?",
+      "expected_pages": [20, 21],
+      "answer_key": "They are stack algorithms: the pages held with n frames are a subset of those held with n+1 frames, so adding a frame cannot increase faults."
+    },
+    {
+      "id": "second_chance_clock",
+      "question": "How does the second-chance or clock algorithm modify FIFO?",
+      "expected_pages": [22],
+      "answer_key": "It checks the candidate's reference bit. A zero bit allows replacement; a one bit is cleared and the page is skipped for another chance. A circular queue and pointer implement the scan."
+    },
+    {
+      "id": "enhanced_second_chance",
+      "question": "Which reference/modify-bit class is the best victim in enhanced second chance, and why?",
+      "expected_pages": [22, 23],
+      "answer_key": "Class (0,0), neither recently used nor modified, is best because it is less likely to be needed soon and does not need to be written back."
+    },
+    {
+      "id": "lfu_mfu",
+      "question": "How do LFU and MFU differ in the page they replace?",
+      "expected_pages": [23, 24],
+      "answer_key": "LFU replaces the page with the smallest reference count. MFU replaces the page with the largest count, based on the argument that a low-count page may have just arrived and not yet been used."
+    },
+    {
+      "id": "page_buffering",
+      "question": "How can a free-frame pool help a process restart sooner after a page fault?",
+      "expected_pages": [24],
+      "answer_key": "The desired page can be read into a free frame before the victim is written out, letting the process restart without waiting for the page-out to finish."
+    },
+    {
+      "id": "raw_io",
+      "question": "What is raw I/O, and which file-system services does it bypass?",
+      "expected_pages": [25],
+      "answer_key": "Raw I/O accesses a storage partition as logical blocks without file-system data structures. It bypasses services such as file names, directories, locking, prefetching, and space allocation."
+    },
+    {
+      "id": "minimum_frames",
+      "question": "Why must an operating system allocate a process a minimum number of frames?",
+      "expected_pages": [25],
+      "answer_key": "A process needs enough frames to hold all the different pages that one instruction may reference; otherwise, restarting that instruction after a fault may not be possible."
+    }
+  ]
+}
