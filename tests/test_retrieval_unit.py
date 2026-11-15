@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-import retrieval
+from ai_pdf_assistant import retrieval
 
 
 class FixedEmbeddingModel:

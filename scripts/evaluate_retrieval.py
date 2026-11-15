@@ -7,8 +7,8 @@ same top-eight-plus-neighbor context that the Streamlit app sends to the model.
 import json
 from pathlib import Path
 
-from pdf_processing import extract_pdf_pages
-from retrieval import (
+from ai_pdf_assistant.pdf_processing import extract_pdf_pages
+from ai_pdf_assistant.retrieval import (
     create_embeddings,
     create_keyword_index,
     find_relevant_passages,
@@ -17,7 +17,7 @@ from retrieval import (
 )
 
 
-PROJECT_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = Path(__file__).resolve().parents[1]
 EVALUATION_PATH = PROJECT_DIR / "evaluation" / "questions.json"
 TOP_K = 8
 

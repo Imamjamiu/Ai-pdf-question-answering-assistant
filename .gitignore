@@ -14,6 +14,7 @@ uploads/
 *.pickle
 *.faiss
 *.db
+*.egg-info/
 
 # IDE and operating system files
 .idea/
