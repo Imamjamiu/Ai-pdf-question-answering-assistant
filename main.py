@@ -3,9 +3,9 @@ import re
 
 import streamlit as st
 
-from pdf_processing import extract_pdf_pages
+from ai_pdf_assistant.pdf_processing import extract_pdf_pages
 
-from retrieval import (
+from ai_pdf_assistant.retrieval import (
     split_pages_into_chunks,
     create_embeddings,
     create_keyword_index,
@@ -13,8 +13,7 @@ from retrieval import (
     add_neighboring_chunks
 )
 
-from answer_generation import generate_answer
-
+from ai_pdf_assistant.answer_generation import generate_answer
 
 def get_cited_pages(answer, context_passages):
     """Return cited PDF pages that have matching retrieved passages."""

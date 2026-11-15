@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 
-PROJECT_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = Path(__file__).resolve().parents[1]
 EVALUATION_PATH = PROJECT_DIR / "evaluation" / "questions.json"
 REVIEW_PATH = PROJECT_DIR / "evaluation" / "answer_review.csv"
 STATUSES = {"pass", "partial", "fail"}
