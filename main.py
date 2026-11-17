@@ -1,10 +1,7 @@
 import hashlib
 import re
-
 import streamlit as st
-
 from ai_pdf_assistant.pdf_processing import extract_pdf_pages
-
 from ai_pdf_assistant.retrieval import (
     split_pages_into_chunks,
     create_embeddings,
@@ -12,8 +9,49 @@ from ai_pdf_assistant.retrieval import (
     find_relevant_passages,
     add_neighboring_chunks
 )
-
 from ai_pdf_assistant.answer_generation import generate_answer
+
+
+def is_acknowledgement(message):
+    """Check whether a message is a simple conversational acknowledgement."""
+
+    acknowledgements = {
+        "thanks",
+        "thank you",
+        "thanks a lot",
+        "thank you very much",
+        "okay",
+        "ok",
+        "okay thanks",
+        "ok thanks",
+        "i understand",
+        "understood",
+        "got it",
+        "good",
+        "great",
+        "nice",
+        "perfect",
+        "that's helpful",
+        "that is helpful",
+        "very helpful",
+        "helpful",
+        "alright",
+        "all right",
+        "cool",
+        "noted",
+        "makes sense",
+        "i see",
+        "excellent",
+        "well done",
+    }
+
+    normalized_message = re.sub(
+        r"[.!?,]+$", "", message.lower().strip()
+    )
+
+    return normalized_message in acknowledgements
+
+
 
 def get_cited_pages(answer, context_passages):
     """Return cited PDF pages that have matching retrieved passages."""
@@ -305,6 +343,18 @@ if uploaded_file is not None:
             )
 
             messages = st.session_state["pdf_chat_messages"]
+
+            if question and is_acknowledgement(question):
+                messages.extend([
+                    {"role": "user", "content": question},
+                    {
+                        "role": "assistant",
+                        "content": "You're welcome! Let me know if you have another question.",
+                        "passages": []
+                    }
+                ])
+                question = None
+
             if question:
                 prior_history = list(messages)
                 summary_request = is_summary_follow_up(question)
