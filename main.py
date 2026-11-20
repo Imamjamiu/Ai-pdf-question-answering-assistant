@@ -61,7 +61,7 @@ st.write(
 )
 st.markdown(
     "**How to use it**\n"
-    "1. Upload a PDF with selectable text.\n"
+    "1. Upload a PDF with selectable text, scanned pages, or a mixture of both.\n"
     "2. Ask one or more questions about the PDF.\n"
     "3. Ask follow-ups or start a new question about the PDF.\n"
     "4. Type summarize your answer to summarize the previous answer.\n"
