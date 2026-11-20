@@ -93,3 +93,4 @@ def test_hybrid_search_can_promote_a_keyword_match(monkeypatch):
     assert len(results) == 1
     assert results[0]["chunk_index"] == 0
     assert results[0]["keyword_rank"] == 1
+
