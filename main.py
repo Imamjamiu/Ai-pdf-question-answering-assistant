@@ -1,6 +1,6 @@
 import hashlib
 import streamlit as st
-from ai_pdf_assistant.pdf_processing import extract_pdf_pages
+from ai_pdf_assistant.pdf_processing import extract_pdf_pages, OcrDependencyError
 from ai_pdf_assistant.retrieval import (
     split_pages_into_chunks, create_embeddings, create_keyword_index,
     find_relevant_passages, add_neighboring_chunks,
@@ -61,7 +61,7 @@ st.write(
 )
 st.markdown(
     "**How to use it**\n"
-    "1. Upload a PDF with selectable text.\n"
+    "1. Upload a PDF with selectable text, scanned pages, or a mixture of both.\n"
     "2. Ask one or more questions about the PDF.\n"
     "3. Ask follow-ups or start a new question about the PDF.\n"
     "4. Type summarize your answer to summarize the previous answer.\n"
@@ -71,17 +71,13 @@ st.markdown(
 # Process the uploaded PDF
 @st.cache_data(show_spinner=False)
 def process_uploaded_pdf(pdf_bytes):
-    # Extract individual PDF pages
+    # Extract individual PDF pages, including local OCR where needed
     page_count, pages = extract_pdf_pages(pdf_bytes)
-    # Create one text string for document statistics
     full_text = "\n".join(page["text"] for page in pages)
-    # Create chunks while preserving page numbers
     chunks = split_pages_into_chunks(pages)
-    # Generate semantic embeddings
-    embeddings = create_embeddings(chunks)
-    # Create keyword index
-    keyword_index = create_keyword_index(chunks)
-    return page_count, full_text, chunks, embeddings, keyword_index
+    embeddings = create_embeddings(chunks) if chunks else []
+    keyword_index = create_keyword_index(chunks) if chunks else None
+    return page_count, full_text, pages, chunks, embeddings, keyword_index
 
 # Upload a PDF
 uploaded_file = st.file_uploader("Choose a PDF document", type=["pdf"])
@@ -89,15 +85,28 @@ if uploaded_file:
     try:
         with st.spinner("Processing your PDF..."):
             pdf_bytes = uploaded_file.getvalue()
-            page_count, full_text, chunks, embeddings, keyword_index = process_uploaded_pdf(pdf_bytes)
+            page_count, full_text, extracted_pages, chunks, embeddings, keyword_index = process_uploaded_pdf(pdf_bytes)
 
         if not full_text.strip():
             st.warning(
-                "No readable text was found. This app needs a text-based PDF; "
-                "scanned pages are not processed with OCR."
+                "No readable text was found. The PDF may contain blank pages, "
+                "unsupported image content, or OCR may not be configured."
             )
         else:
             st.success("PDF processed successfully!")
+            native_pages = sum(page.get("extraction_method") == "native" for page in extracted_pages)
+            ocr_pages = sum(page.get("extraction_method") == "ocr" for page in extracted_pages)
+            mixed_pages = sum(page.get("extraction_method") == "mixed" for page in extracted_pages)
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("PDF pages", page_count)
+            col2.metric("Text chunks", len(chunks))
+            col3.metric("OCR-processed pages", ocr_pages + mixed_pages)
+            col4.metric("Extracted characters", f"{len(full_text):,}")
+            with st.expander("Text extraction details"):
+                st.write(f"Pages with native text: {native_pages}")
+                st.write(f"Pages processed with OCR: {ocr_pages}")
+                st.write(f"Pages containing both native and OCR text: {mixed_pages}")
+                st.caption("OCR runs locally through Tesseract. Embedded images on pages that also contain selectable text are OCRed separately.")
             # Display document information
             col1, col2, col3 = st.columns(3)
             col1.metric("PDF pages", page_count)
@@ -264,11 +273,13 @@ if uploaded_file:
                                                 "message_index": message_index, "action_key": action_key,
                                             }
                                             st.rerun()
+    except OcrDependencyError as error:
+        st.error(str(error))
     except Exception as error:
         print(f"PDF processing error: {error!r}")
         st.error(
             "I couldn't finish processing this PDF. "
             "Possible reasons: the file is corrupted, password-protected, "
-            "or contains only scanned images (OCR is not supported yet). "
+            "or an OCR/rendering problem. "
             "Check the console for technical details."
         )

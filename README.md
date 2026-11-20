@@ -11,6 +11,16 @@ A Streamlit app that lets you upload a text-based PDF, ask follow-up questions a
 5. Shows the complete answer first, followed by compact page citations; click a citation to open its supporting passage in a popover.
 6. Keeps an in-session conversation for the current PDF, with context-aware follow-ups and independent new questions. Answer buttons offer clearer explanations, more detail, summaries, and examples. Short follow-ups use the current topic, complete questions start fresh searches, and "summarize your answer" reuses the previous answer's passages. Answers still need support from the uploaded PDF; changing the PDF clears the conversation.
 
+## OCR setup
+
+OCR is performed locally with the open-source Tesseract engine; the app does not send PDF pages to a paid OCR API.
+
+- **Windows / PyCharm:** install the Python dependencies with `python -m pip install -r requirements.txt`. Install the Tesseract OCR application separately, add the folder containing `tesseract.exe` to your Windows PATH, restart the terminal, and verify with `tesseract --version`.
+- **Streamlit Community Cloud:** the root-level `packages.txt` installs the `tesseract-ocr` system package during deployment.
+- The default OCR language is English (`eng`). Other languages require their Tesseract language data to be installed.
+
+Pages with little selectable text are OCRed as a whole. On mixed pages, meaningful embedded-image regions are OCRed separately and merged with the native text. OCR extracts text; it does not yet understand diagram structure or display the original figures and tables.
+
 ## Requirements
 
 - Python 3.10 or newer
@@ -91,7 +101,7 @@ These tests check retrieval helpers; they do not verify the quality or factual a
 
 ## Current limitations
 
-- Scanned PDFs without selectable text may produce no usable passages; OCR is not included.
+- Scanned pages and text inside meaningful embedded-image regions are processed with local Tesseract OCR. OCR extracts text; it does not yet interpret diagrams or preserve figures as retrievable visual assets.
 - Retrieval can miss a useful passage, and generated answers or citations can still be incomplete or incorrect. Check the supporting passages before relying on an answer.
 - Answer generation depends on provider availability, account limits, and API quotas.
 - The bundled evaluation set covers one virtual-memory PDF. More documents and questions are needed to assess performance across different PDFs.
