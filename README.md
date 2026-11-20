@@ -91,7 +91,7 @@ These tests check retrieval helpers; they do not verify the quality or factual a
 
 ## Current limitations
 
-- Scanned PDFs without selectable text may produce no usable passages; OCR is not included.
+- Scanned pages and text inside meaningful embedded-image regions are processed with local Tesseract OCR. OCR extracts text; it does not yet interpret diagrams or preserve figures as retrievable visual assets.
 - Retrieval can miss a useful passage, and generated answers or citations can still be incomplete or incorrect. Check the supporting passages before relying on an answer.
 - Answer generation depends on provider availability, account limits, and API quotas.
 - The bundled evaluation set covers one virtual-memory PDF. More documents and questions are needed to assess performance across different PDFs.
