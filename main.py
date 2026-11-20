@@ -1,6 +1,6 @@
 import hashlib
 import streamlit as st
-from ai_pdf_assistant.pdf_processing import extract_pdf_pages
+from ai_pdf_assistant.pdf_processing import extract_pdf_pages, OcrDependencyError
 from ai_pdf_assistant.retrieval import (
     split_pages_into_chunks, create_embeddings, create_keyword_index,
     find_relevant_passages, add_neighboring_chunks,
@@ -89,7 +89,7 @@ if uploaded_file:
     try:
         with st.spinner("Processing your PDF..."):
             pdf_bytes = uploaded_file.getvalue()
-            page_count, full_text, chunks, embeddings, keyword_index = process_uploaded_pdf(pdf_bytes)
+            page_count, full_text, extracted_pages, chunks, embeddings, keyword_index = process_uploaded_pdf(pdf_bytes)
 
         if not full_text.strip():
             st.warning(
@@ -98,6 +98,19 @@ if uploaded_file:
             )
         else:
             st.success("PDF processed successfully!")
+            native_pages = sum(page.get("extraction_method") == "native" for page in extracted_pages)
+            ocr_pages = sum(page.get("extraction_method") == "ocr" for page in extracted_pages)
+            mixed_pages = sum(page.get("extraction_method") == "mixed" for page in extracted_pages)
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("PDF pages", page_count)
+            col2.metric("Text chunks", len(chunks))
+            col3.metric("OCR-processed pages", ocr_pages + mixed_pages)
+            col4.metric("Extracted characters", f"{len(full_text):,}")
+            with st.expander("Text extraction details"):
+                st.write(f"Pages with native text: {native_pages}")
+                st.write(f"Pages processed with OCR: {ocr_pages}")
+                st.write(f"Pages containing both native and OCR text: {mixed_pages}")
+                st.caption("OCR runs locally through Tesseract. Embedded images on pages that also contain selectable text are OCRed separately.")
             # Display document information
             col1, col2, col3 = st.columns(3)
             col1.metric("PDF pages", page_count)
@@ -264,6 +277,8 @@ if uploaded_file:
                                                 "message_index": message_index, "action_key": action_key,
                                             }
                                             st.rerun()
+    except OcrDependencyError as error:
+        st.error(str(error))
     except Exception as error:
         print(f"PDF processing error: {error!r}")
         st.error(
