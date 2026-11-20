@@ -71,17 +71,13 @@ st.markdown(
 # Process the uploaded PDF
 @st.cache_data(show_spinner=False)
 def process_uploaded_pdf(pdf_bytes):
-    # Extract individual PDF pages
+    # Extract individual PDF pages, including local OCR where needed
     page_count, pages = extract_pdf_pages(pdf_bytes)
-    # Create one text string for document statistics
     full_text = "\n".join(page["text"] for page in pages)
-    # Create chunks while preserving page numbers
     chunks = split_pages_into_chunks(pages)
-    # Generate semantic embeddings
-    embeddings = create_embeddings(chunks)
-    # Create keyword index
-    keyword_index = create_keyword_index(chunks)
-    return page_count, full_text, chunks, embeddings, keyword_index
+    embeddings = create_embeddings(chunks) if chunks else []
+    keyword_index = create_keyword_index(chunks) if chunks else None
+    return page_count, full_text, pages, chunks, embeddings, keyword_index
 
 # Upload a PDF
 uploaded_file = st.file_uploader("Choose a PDF document", type=["pdf"])
@@ -93,8 +89,8 @@ if uploaded_file:
 
         if not full_text.strip():
             st.warning(
-                "No readable text was found. This app needs a text-based PDF; "
-                "scanned pages are not processed with OCR."
+                "No readable text was found. The PDF may contain blank pages, "
+                "unsupported image content, or OCR may not be configured."
             )
         else:
             st.success("PDF processed successfully!")
@@ -284,6 +280,6 @@ if uploaded_file:
         st.error(
             "I couldn't finish processing this PDF. "
             "Possible reasons: the file is corrupted, password-protected, "
-            "or contains only scanned images (OCR is not supported yet). "
+            "or an OCR/rendering problem. "
             "Check the console for technical details."
         )
