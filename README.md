@@ -113,8 +113,8 @@ sudo apt-get install tesseract-ocr
 Clone the repository and enter the project directory:
 
 ```bash
-git clone https://github.com/Imamjamiu/Ai-pdf-question-answering-assistant.git
-cd Ai-pdf-question-answering-assistant
+git clone https://github.com/Imamjamiu/DocuMind-AI.git
+cd DocuMind-AI
 ```
 
 Create and activate a virtual environment.
@@ -259,4 +259,4 @@ Passing automated tests does not establish that every generated answer is factua
 
 ## License
 
-No license has been specified for this repository yet. If you intend others to use, modify, or redistribute the project, add an appropriate open-source license file.
+This project is licensed under the [MIT License](LICENSE). You are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to the conditions in the license.
