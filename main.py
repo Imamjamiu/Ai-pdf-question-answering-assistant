@@ -63,10 +63,8 @@ ANSWER_ACTIONS = {
     },
 }
 
-# --------------------------------------------------
-# Professional application interface
-# -------------------------------------------------
 
+# Professional application interface
 st.set_page_config(
     page_title="DocuMind AI | PDF Assistant",
     page_icon="📘",
@@ -86,18 +84,63 @@ st.markdown(
     }
     .block-container { max-width: 1120px; padding-top: 2rem; padding-bottom: 5rem; }
     [data-testid="stHeader"] { background: transparent; }
-    .dm-brand { display:flex; align-items:center; gap:.65rem; color:var(--dm-ink);
-        font-weight:750; letter-spacing:-.025em; font-size:1.08rem; margin-bottom:2rem; }
-    .dm-brand-mark { width:2.35rem; height:2.35rem; display:grid; place-items:center;
-        border-radius:.8rem; color:white; font-size:1.15rem;
-        background:linear-gradient(135deg,#766DFF,#5148E5);
-        box-shadow:0 7px 18px rgba(99,91,255,.22); }
-    .dm-eyebrow { color:var(--dm-accent); text-transform:uppercase; letter-spacing:.13em;
-        font-size:.72rem; font-weight:750; margin-bottom:.55rem; }
-    .dm-title { color:var(--dm-ink); font-size:clamp(2rem,4vw,3.05rem);
-        line-height:1.08; letter-spacing:-.055em; font-weight:780; margin:0 0 .75rem 0; }
-    .dm-subtitle { color:var(--dm-muted); font-size:1.02rem; line-height:1.65;
-        max-width:720px; margin-bottom:1.7rem; }
+    .dm-brand {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:.7rem;
+    color:var(--dm-ink);
+    font-weight:800;
+    letter-spacing:-.045em;
+    font-size:clamp(2.5rem,5vw,3.5rem);
+    margin-bottom:.45rem;
+}
+.dm-brand-mark {
+    width:2.8rem;
+    height:2.8rem;
+    display:grid;
+    place-items:center;
+    border-radius:.8rem;
+    color:white;
+    font-size:1.5rem;
+    background:linear-gradient(135deg,#766DFF,#5148E5);
+    box-shadow:0 7px 18px rgba(99,91,255,.22);
+}
+.dm-eyebrow {
+    color:var(--dm-muted);
+    text-align:center;
+    font-size:1.08rem;
+    font-weight:550;
+    letter-spacing:-.015em;
+    margin-bottom:.8rem;
+}
+.dm-title {
+    color:var(--dm-ink);
+    text-align:center;
+    font-size:clamp(1.25rem,2.5vw,1.7rem);
+    line-height:1.3;
+    letter-spacing:-.025em;
+    font-weight:700;
+    margin:0 0 .8rem 0;
+    white-space:nowrap;
+}
+.dm-subtitle {
+    color:var(--dm-muted);
+    text-align:center;
+    font-size:1rem;
+    line-height:1.65;
+    max-width:720px;
+    margin:0 auto 1.7rem auto;
+}
+
+.dm-title,
+.dm-subtitle {
+    transform: translateX(50px);
+}
+.dm-eyebrow {
+    transform: translateX(22px);
+}
+
     .dm-success { display:flex; align-items:center; gap:.8rem;
         border:1px solid rgba(22,163,74,.28); background:rgba(22,163,74,.07);
         border-radius:1rem; padding:1rem 1.15rem; margin:.75rem 0 1rem 0; }
@@ -118,7 +161,7 @@ st.markdown(
     div.stButton > button:hover { border-color:var(--dm-accent); color:var(--dm-accent); }
     [data-testid="stFileUploader"] { border:1px dashed rgba(99,91,255,.45);
         border-radius:1rem; padding:.65rem; background:rgba(99,91,255,.035); }
-    @media (max-width:700px) { .block-container { padding-left:1rem; padding-right:1rem; } }
+    @media (max-width:700px) {.block-container {padding-left:1rem;padding-right:1rem;}.dm-title {white-space:normal;}}
     </style>
     """,
     unsafe_allow_html=True,
@@ -130,7 +173,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 st.markdown('<div class="dm-eyebrow">Your intelligent PDF workspace</div>', unsafe_allow_html=True)
-st.markdown('<h1 class="dm-title">Understand more.<br>Search less.</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="dm-title">      Understand more. Search less.</h1>', unsafe_allow_html=True)
 st.markdown(
     '<div class="dm-subtitle">Upload a document, ask questions in natural language, '
     'and explore clear answers grounded in your PDF.</div>',
@@ -256,11 +299,7 @@ def retrieve_visual_evidence(
                 continue
 
             if requested_figure:
-                caption_match = re.search(
-                    r"\bfig(?:ure)?\s*(\d+(?:\.\d+)*)\b",
-                    caption,
-                    flags=re.IGNORECASE,
-                )
+                caption_match = re.search(r"\bfig(?:ure)?\s*(\d+(?:\.\d+)*)\b",caption,flags=re.IGNORECASE,)
 
                 if not caption_match:
                     continue
@@ -268,12 +307,8 @@ def retrieve_visual_evidence(
                 if caption_match.group(1) != requested_figure:
                     continue
 
-            if (
-                requested_page is not None
-                and region.get("page_number") != requested_page
-            ):
+            if (requested_page is not None and region.get("page_number") != requested_page):
                 continue
-
             selected_regions.append((index, region))
 
     else:
@@ -300,15 +335,8 @@ def retrieve_visual_evidence(
                 scored_regions.append((score, index, region))
 
         # Highest relevance first; show no more than three.
-        scored_regions.sort(
-            key=lambda item: item[0],
-            reverse=True,
-        )
-
-        selected_regions = [
-            (index, region)
-            for score, index, region in scored_regions[:3]
-        ]
+        scored_regions.sort(key=lambda item: item[0],reverse=True,)
+        selected_regions = [(index, region)for score, index, region in scored_regions[:3]]
 
     # Render and analyse only selected figures.
     for index, region in selected_regions:
@@ -419,8 +447,6 @@ if uploaded_file:
                     st.rerun()
 
             messages = st.session_state["pdf_chat_messages"]
-
-
 
             chat_history_area = st.container()
             question = st.chat_input("Ask anything about your PDF…")
@@ -572,63 +598,63 @@ if uploaded_file:
                         display_answer = clean_answer_for_display(answer_content)
                         cited_pages = get_cited_pages(answer_content, context_passages)
 
-                    if display_answer:
-                        st.markdown(display_answer)
+                        if display_answer:
+                            st.markdown(display_answer)
 
                         # Display original PDF figures used as visual evidence.
-                    message_visuals = message.get("visual_evidence", [])
+                        message_visuals = message.get("visual_evidence", [])
 
-                    for visual in message_visuals:
-                        st.markdown(
-                            f"**Figure from your PDF · Page {visual['page_number']}: "
-                            f"{visual['caption']}**"
-                        )
+                        for visual in message_visuals:
+                            st.markdown(
+                                f"**Figure from your PDF · Page {visual['page_number']}: "
+                                f"{visual['caption']}**"
+                            )
 
-                        st.image(
-                            visual["image_bytes"],
-                            caption=visual["caption"],
-                            use_container_width=True,
-                        )
+                            st.image(
+                                visual["image_bytes"],
+                                caption=visual["caption"],
+                                use_container_width=True,
+                            )
 
-                    with st.container(gap="small"):
-                        if cited_pages:
-                            with st.container(
-                                    horizontal=True, horizontal_alignment="left", gap="small",
-                                    vertical_alignment="center"
+                        with st.container(gap="small"):
+                            if cited_pages:
+                                with st.container(
+                                        horizontal=True, horizontal_alignment="left", gap="small",
+                                        vertical_alignment="center"
+                                ):
+                                    st.markdown(
+                                        "**Sources** · Select a page number to inspect the supporting passage:",
+                                        width="content",
+                                    )
+                                    for page_number in cited_pages:
+                                        with st.popover(f"[page {page_number}]"):
+                                            matching_passages = [
+                                                result for result in context_passages
+                                                if str(result.get("page_number")) == page_number
+                                            ]
+                                            st.markdown(f"**Supporting passage · Page {page_number}**")
+                                            for result in matching_passages:
+                                                st.write(result["text"])
+
+                            if (
+                                    context_passages
+                                    and "OpenRouter and Gemini are both unavailable right now"
+                                    not in answer_content
                             ):
-                                st.markdown(
-                                    "**Sources** · Select a page number to inspect the supporting passage:",
-                                    width="content",
-                                )
-                                for page_number in cited_pages:
-                                    with st.popover(f"[page {page_number}]"):
-                                        matching_passages = [
-                                            result for result in context_passages
-                                            if str(result.get("page_number")) == page_number
-                                        ]
-                                        st.markdown(f"**Supporting passage · Page {page_number}**")
-                                        for result in matching_passages:
-                                            st.write(result["text"])
-
-                        if (
-                                context_passages
-                                and "OpenRouter and Gemini are both unavailable right now"
-                                not in answer_content
-                        ):
-                            with st.container(
-                                horizontal=True, horizontal_alignment="left", gap=None, vertical_alignment="center",
-                            ):
-                                for action_key in ANSWER_ACTIONS:
-                                    action = ANSWER_ACTIONS[action_key]
-                                    if st.button(
-                                        action["label"],
-                                        key=f"answer-action-{message_index}-{action_key}",
-                                        help=action["help"],
-                                    ):
-                                        st.session_state["pending_answer_action"] = {
-                                            "message_index": message_index, "action_key": action_key,
-                                        }
-                                        st.rerun()
+                                with st.container(
+                                    horizontal=True, horizontal_alignment="left", gap=None, vertical_alignment="center",
+                                ):
+                                    for action_key in ANSWER_ACTIONS:
+                                        action = ANSWER_ACTIONS[action_key]
+                                        if st.button(
+                                            action["label"],
+                                            key=f"answer-action-{message_index}-{action_key}",
+                                            help=action["help"],
+                                        ):
+                                            st.session_state["pending_answer_action"] = {
+                                                "message_index": message_index, "action_key": action_key,
+                                            }
+                                            st.rerun()
     except Exception as error:
         print(f"PDF processing error: {error!r}")
         st.error(
